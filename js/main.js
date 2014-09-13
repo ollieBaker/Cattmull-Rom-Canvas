@@ -7,7 +7,8 @@ var canvas,
     tempX,
     tempY;
 
-var aiPathWaypoints = [],
+var paused = true,
+	aiPathWaypoints = [],
     pathNodeTime = 2,
     aiPathWaypointCount = 64,
     aiPathSize,
@@ -35,8 +36,6 @@ var aiPathWaypoints = [],
     canvas = createFullScreenCanvas('canvas');
     canvasUI = createFullScreenCanvas('canvasUI');
 
-    date = Date.now();
-
     generatePath();
 
     if (canvas.getContext) {
@@ -53,7 +52,9 @@ var aiPathWaypoints = [],
     }
 
     document.onclick = hideUI;
-
+    window.onblur = function() {
+   		paused = true;
+	};
 })();
 
 function createFullScreenCanvas(id) {
@@ -70,6 +71,13 @@ function createFullScreenCanvas(id) {
 }
 
 function hideUI() {
+
+	if(paused) {
+		paused = false;
+		date = Date.now();
+		return;
+	}
+
     if (canvasUI.style.visibility == "hidden") {
         canvasUI.style.visibility = "visible";
     } else {
@@ -78,7 +86,10 @@ function hideUI() {
 }
 
 function draw() {
-
+	if(paused == true) {
+		requestAnimationFrame(draw);
+		return;
+	}
     var d = Date.now();
     var dif = (d - date) / 1000;
     date = d;
