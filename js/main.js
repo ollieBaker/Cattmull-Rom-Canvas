@@ -127,7 +127,7 @@ function drawUI() {
     	contextUI.font = "16px Georgia";
     	contextUI.textAlign = 'center';
 		contextUI.fillText(i, aiPathWaypoints[i].x -0, aiPathWaypoints[i].y + 4);
-    	contextUI.stroke();
+    	// contextUI.stroke();
     } 
 	contextUI.fillStyle = "#FFFFFF";
 
