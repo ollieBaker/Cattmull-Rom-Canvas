@@ -99,7 +99,9 @@ textarea {
 
 
 
-
+canvas {
+	max-width: 100%;
+}
 
 
 
