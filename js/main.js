@@ -116,13 +116,13 @@ function drawUI() {
 }
 
 function resizeCanvas() {
-	canvas.width = window.innerWidth;
+	/*canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvasUI.width = window.innerWidth;
     canvasUI.height = window.innerHeight;
     drawUI();
 	width = window.innerWidth;
-    height = window.innerHeight;	
+    height = window.innerHeight;*/
 }
 
 function spline (p0, p1, p2, p3, t)  
