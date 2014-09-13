@@ -81,7 +81,7 @@ function draw() {
 	date = d;
 	age += dif;
 
-	context.globalAlpha = 0.05;
+	context.globalAlpha = 0.025;
 	context.fillStyle = "#FFFFFF";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	context.globalAlpha = 1;
@@ -143,7 +143,7 @@ function spline (p0, p1, p2, p3, t)
 
 function generatePath()
 { 
-    console.log("Generating AI path"); 
+    console.log("Generating random path"); 
     aiPathWaypoints = [];    
     var n = aiPathWaypointCount; 
     for (var i = 0; i < n; i++)  
