@@ -8,11 +8,12 @@ var canvas,
 	tempY;
 
 var aiPathWaypoints = [],
-	pathNodeTime = 1, 
+	pathNodeTime = 2, 
 	aiPathWaypointCount = 64,
 	aiPathSize,
 	aiPathSizeOffset,
 	age = 0,
+	speed = 0.5,
 	date;
 	
 
@@ -33,12 +34,13 @@ var aiPathWaypoints = [],
 
 	date = Date.now();
 
+	generatePath();     
+
 	if (canvas.getContext) {
         context = canvas.getContext("2d");
         context.webkitImageSmoothingEnabled = true;
         window.addEventListener('resize', resizeCanvas, false);
-    	draw();  
-    	
+    	draw();    	
 	}
 
 	if(canvasUI.getContext) {
@@ -72,27 +74,18 @@ function hideUI() {
 	}
 }
 
-
 function draw() {
-
-	if (aiPathWaypoints.length == 0) {
-    	generatePath(); 
-    }
 
 	var d = Date.now();
 	var dif = (d - date) / 1000;
 	date = d;
 	age += dif;
-	
+
 	context.globalAlpha = 0.05;
 	context.fillStyle = "#FFFFFF";
-	context.fillRect(0,0,canvas.width,canvas.height);
+	context.fillRect(0, 0, canvas.width, canvas.height);
 	context.globalAlpha = 1;
-
 	
-
-	context.fillStyle = "#FFFFFF";
-
 	var pathProgress = age / pathNodeTime; 
 	var newPos = calculatePathPosition(pathProgress); 
 
@@ -106,7 +99,7 @@ function draw() {
 
 function drawUI() {
 
-	
+	contextUI.clearRect(0, 0, width, height);
     contextUI.strokeStyle = "#000000";
 	for (var i = 0; i < aiPathWaypointCount; i++)
     { 
@@ -118,10 +111,8 @@ function drawUI() {
     	contextUI.font = "16px Georgia";
     	contextUI.textAlign = 'center';
 		contextUI.fillText(i, aiPathWaypoints[i].x -0, aiPathWaypoints[i].y + 4);
-    	// contextUI.stroke();
     } 
 	contextUI.fillStyle = "#FFFFFF";
-
 }
 
 function resizeCanvas() {
@@ -148,7 +139,6 @@ function spline (p0, p1, p2, p3, t)
         t * ((2 * p0.y -5 * p1.y +4 * p2.y -p3.y) + 
         t * (  -p0.y +3 * p1.y -3 * p2.y +p3.y)))) 
     };
-
 } 
 
 function generatePath()
@@ -159,8 +149,7 @@ function generatePath()
     for (var i = 0; i < n; i++)  
     { 
         aiPathWaypoints.push ( { x: (aiPathSize.x * Math.random ()) + aiPathSizeOffset/2, y: (aiPathSize.y * Math.random ()) + aiPathSizeOffset/2 } ); 
-    } 
-
+    }
 } 
 
 function calculatePathPosition(ratio)
