@@ -28,33 +28,14 @@ var aiPathWaypoints = [],
     aiPathSizeOffset = 100;
     aiPathSize = {x: width - aiPathSizeOffset, y: height - aiPathSizeOffset};
 
-	canvas = document.createElement('canvas');
-	canvas.id = 'canvas';
-	canvas.width = width;
-	canvas.height = height;
-	canvas.style.position = 'absolute';
-	canvas.style.top = '0';
-	canvas.style.left = '0';
-	document.body.appendChild(canvas);
-
-	canvasUI = document.createElement('canvas');
-	canvasUI.id = 'canvasUI';
-	canvasUI.width = width;
-	canvasUI.height = height;
-	canvasUI.style.position = 'absolute';
-	canvasUI.style.top = '0';
-	canvasUI.style.left = '0';
-	document.body.appendChild(canvasUI);
-	
-	// console.log("canvas");
+	canvas = createFullScreenCanvas('canvas');
+	canvasUI = createFullScreenCanvas('canvasUI');	
 
 	date = Date.now();
-	//generatePath();
 
 	if (canvas.getContext) {
         context = canvas.getContext("2d");
         context.webkitImageSmoothingEnabled = true;
-		// resize the canvas to fill browser window dynamically
         window.addEventListener('resize', resizeCanvas, false);
     	draw();  
     	
@@ -69,6 +50,19 @@ var aiPathWaypoints = [],
 	document.onclick = hideUI;
 
 }) ();
+
+function createFullScreenCanvas(id) {
+	var c = document.createElement('canvas');
+	c.id = id;
+	c.width = width;
+	c.height = height;
+	c.style.position = 'absolute';
+	c.style.top = '0';
+	c.style.left = '0';
+	document.body.appendChild(c);
+
+	return c;
+}
 
 function hideUI() {
 	if(canvasUI.style.visibility == "hidden") {
@@ -89,9 +83,7 @@ function draw() {
 	var dif = (d - date) / 1000;
 	date = d;
 	age += dif;
-	// console.log("currentTime ", dif );
-	// console.log("age ", age );
-
+	
 	context.globalAlpha = 0.05;
 	context.fillStyle = "#FFFFFF";
 	context.fillRect(0,0,canvas.width,canvas.height);
@@ -102,7 +94,6 @@ function draw() {
 	context.fillStyle = "#FFFFFF";
 
 	var pathProgress = age / pathNodeTime; 
-	// console.log("prog", pathProgress);
 	var newPos = calculatePathPosition(pathProgress); 
 
 	context.beginPath();
