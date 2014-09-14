@@ -23,8 +23,6 @@ var paused = true,
     width = window.innerWidth;
     height = window.innerHeight;
 
-    // console.log(width, height);
-
     tempX = width / 2;
     tempY = height / 2;
 
@@ -38,13 +36,6 @@ var paused = true,
     canvasUI = createFullScreenCanvas('canvasUI');
 
     generateBetterPath();
-
-    if (canvas.getContext) {
-        context = canvas.getContext("2d");
-        context.webkitImageSmoothingEnabled = true;
-        window.addEventListener('resize', resizeCanvas, false);
-        draw();
-    }
 
     if (canvasUI.getContext) {
         contextUI = canvasUI.getContext("2d");
@@ -96,6 +87,13 @@ var paused = true,
 
     var canvasContainer = document.getElementById('canvasContainer');
     canvasContainer.onclick = hideUI;
+
+    if (canvas.getContext) {
+        context = canvas.getContext("2d");
+        context.webkitImageSmoothingEnabled = true;
+        //window.addEventListener('resize', resizeCanvas, false);
+        draw();
+    }
 
 })();
 
@@ -169,29 +167,6 @@ function drawUI() {
     contextUI.fillStyle = "#FFFFFF";
 }
 
-function resizeCanvas() {
-    /*canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    canvasUI.width = window.innerWidth;
-    canvasUI.height = window.innerHeight;
-    drawUI();
-    width = window.innerWidth;
-    height = window.innerHeight;*/
-}
-
-function spline(p0, p1, p2, p3, t) {
-    return {
-        x: 0.5 * ((2 * p1.x) +
-            t * ((-p0.x + p2.x) +
-                t * ((2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) +
-                    t * (-p0.x + 3 * p1.x - 3 * p2.x + p3.x)))),
-        y: 0.5 * ((2 * p1.y) +
-            t * ((-p0.y + p2.y) +
-                t * ((2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) +
-                    t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y))))
-    };
-}
-
 function generateBetterPath() {
     var gridSize = 78;
     var halfGridSize = gridSize * 0.5;
@@ -231,8 +206,32 @@ function jitter(point, jitter) {
     return point;
 }
 
-function generatePath() {
-    console.log("Generating random path");
+function calculatePathPosition(ratio) {
+    var i = Math.floor(ratio);
+    var pointratio = ratio - i;
+    var p0 = aiPathWaypoints[(i - 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
+    var p1 = aiPathWaypoints[i % aiPathWaypoints.length];
+    var p2 = aiPathWaypoints[(i + 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
+    var p3 = aiPathWaypoints[(i + 2 + aiPathWaypoints.length) % aiPathWaypoints.length];
+    var q = spline(p0, p1, p2, p3, pointratio);
+    return q;
+}
+
+function spline(p0, p1, p2, p3, t) {
+    return {
+        x: 0.5 * ((2 * p1.x) +
+            t * ((-p0.x + p2.x) +
+                t * ((2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) +
+                    t * (-p0.x + 3 * p1.x - 3 * p2.x + p3.x)))),
+        y: 0.5 * ((2 * p1.y) +
+            t * ((-p0.y + p2.y) +
+                t * ((2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) +
+                    t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y))))
+    };
+}
+
+
+/*function generatePath() {
     aiPathWaypoints = [];
     var n = aiPathWaypointCount;
     for (var i = 0; i < n; i++) {
@@ -241,17 +240,14 @@ function generatePath() {
             y: (aiPathSize.y * Math.random()) + aiPathSizeOffset / 2
         });
     }
-}
+}*/
 
-function calculatePathPosition(ratio) {
-    var i = Math.floor(ratio);
-    var pointratio = ratio - i;
-    // console.log(ratio + ' ratio = path point ' + i + ' segment ratio ' + pointratio); 
-    var p0 = aiPathWaypoints[(i - 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
-    var p1 = aiPathWaypoints[i % aiPathWaypoints.length];
-    var p2 = aiPathWaypoints[(i + 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
-    var p3 = aiPathWaypoints[(i + 2 + aiPathWaypoints.length) % aiPathWaypoints.length];
-    // figure out current position 
-    var q = spline(p0, p1, p2, p3, pointratio);
-    return q;
-}
+/*function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvasUI.width = window.innerWidth;
+    canvasUI.height = window.innerHeight;
+    drawUI();
+    width = window.innerWidth;
+    height = window.innerHeight;
+}*/
