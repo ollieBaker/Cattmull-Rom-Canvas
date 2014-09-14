@@ -8,6 +8,7 @@ var canvas,
     tempY;
 
 var paused = true,
+    started = false,
 	aiPathWaypoints = [],
     pathNodeTime = 2,
     aiPathWaypointCount = 64,
@@ -27,12 +28,12 @@ var paused = true,
     tempX = width / 2;
     tempY = height / 2;
 
-    aiPathSizeOffset = 100;
+    aiPathSizeOffset = 200;
     aiPathSize = {
         x: width - aiPathSizeOffset,
         y: height - aiPathSizeOffset
     };
-
+    
     canvas = createFullScreenCanvas('canvas');
     canvasUI = createFullScreenCanvas('canvasUI');
 
@@ -50,38 +51,75 @@ var paused = true,
         contextUI.webkitImageSmoothingEnabled = true;
         drawUI();
     }
+    
+    var reset = document.getElementById('reset');
+    var start = document.getElementById('start');
+    var waypoints = document.getElementById('waypoints');
+    waypoints.value = aiPathWaypointCount;
+   
+    var reg = new RegExp(/^\d+$/);
+    waypoints.onchange = function() {        
+        if(!reg.test(waypoints.value) || waypoints.value < 2 || waypoints.value > 512) {
+            waypoints.value = aiPathWaypointCount;
+       }
+       aiPathWaypointCount = waypoints.value;
+    };
+   
 
-    document.onclick = hideUI;
+    reset.onclick = function() {
+        context.clearRect(0, 0, width, height);
+        age = 0;
+        paused = true;
+        started = false;
+        start.innerHTML = "Start";
+        generatePath();
+        drawUI();
+    };
+
+    start.onclick = function() {
+        if(paused) {
+            paused = false;
+            start.innerHTML = 'Pause';            
+            date = Date.now();
+        } else {
+            paused = true;
+            start.innerHTML = 'Resume';
+        }
+    };
+
     window.onblur = function() {
    		paused = true;
+        if(started) {
+            start.innerHTML = 'Resume';
+        }
 	};
+
+    var canvasContainer = document.getElementById('canvasContainer');
+    canvasContainer.onclick = hideUI;
+
 })();
 
 function createFullScreenCanvas(id) {
     var c = document.createElement('canvas');
+    var container = document.getElementById('canvasContainer');
     c.id = id;
     c.width = width;
     c.height = height;
     c.style.position = 'absolute';
     c.style.top = '0';
     c.style.left = '0';
-    document.body.appendChild(c);
-
+    container.appendChild(c);
     return c;
 }
 
-function hideUI() {
-
-	if(paused) {
-		paused = false;
-		date = Date.now();
-		return;
-	}
-
+function hideUI() {	
+    var uiContainer = document.getElementById('uiContainer');
     if (canvasUI.style.visibility == "hidden") {
         canvasUI.style.visibility = "visible";
+        uiContainer.style.visibility = "visible";
     } else {
         canvasUI.style.visibility = "hidden";
+        uiContainer.style.visibility = "hidden";
     }
 }
 
@@ -90,6 +128,9 @@ function draw() {
 		requestAnimationFrame(draw);
 		return;
 	}
+
+    started = true;
+
     var d = Date.now();
     var dif = (d - date) / 1000;
     date = d;
@@ -116,14 +157,14 @@ function drawUI() {
     contextUI.clearRect(0, 0, width, height);
     contextUI.strokeStyle = "#000000";
     for (var i = 0; i < aiPathWaypointCount; i++) {
-        contextUI.fillStyle = "#FF0000";
+        contextUI.fillStyle = "#FF2222";
         contextUI.beginPath();
         contextUI.arc(aiPathWaypoints[i].x, aiPathWaypoints[i].y, 12, 0, 2 * Math.PI, false);
         contextUI.fill();
         contextUI.fillStyle = "#000000"
-        contextUI.font = "16px Georgia";
+        contextUI.font = "15px sans-serif";
         contextUI.textAlign = 'center';
-        contextUI.fillText(i, aiPathWaypoints[i].x - 0, aiPathWaypoints[i].y + 4);
+        contextUI.fillText(i, aiPathWaypoints[i].x, aiPathWaypoints[i].y + 6);
     }
     contextUI.fillStyle = "#FFFFFF";
 }

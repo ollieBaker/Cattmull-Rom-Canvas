@@ -97,12 +97,30 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-
-
 canvas {
 	max-width: 100%;
 }
 
+#uiContainer {
+    width: 21%;
+    margin: 1em;
+    margin-top: 0.5em;
+}
+
+.input-group {
+    padding-top: 0.5em;
+}
+
+h1 {
+    float: left;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
 
 
 
