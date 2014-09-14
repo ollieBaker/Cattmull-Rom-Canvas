@@ -8,6 +8,7 @@ var canvas,
     tempY;
 
 var paused = true,
+    looping = false,
     started = false,
     aiPathWaypoints = [],
     pathNodeTime = 2,
@@ -16,6 +17,7 @@ var paused = true,
     aiPathSizeOffset,
     age = 0,
     speed = 0.5,
+    currentWaypoint = 0,
     date;
 
 
@@ -44,22 +46,46 @@ var paused = true,
     }
 
     var reset = document.getElementById('reset');
+    var loop = document.getElementById('loop');
     var start = document.getElementById('start');
     var waypoints = document.getElementById('waypoints');
-    waypoints.value = aiPathWaypointCount;
+    var speed = document.getElementById('speed');
 
-    var reg = new RegExp(/^\d+$/);
+    var reg = new RegExp(/^[0-9]+(\.[0-9]{1,2})?$/);
     waypoints.onchange = function() {
-        if (!reg.test(waypoints.value) || waypoints.value < 2 || waypoints.value > 512) {
+        if (!reg.test(waypoints.value) || waypoints.value < 2 || waypoints.value > 152) {
             waypoints.value = aiPathWaypointCount;
         }
         aiPathWaypointCount = waypoints.value;
-    };
+        if(!started) {
+            context.clearRect(0, 0, width, height);
+            age = 0;
+            paused = true;
+            started = false;
+            start.innerHTML = "Start";
+            generateBetterPath();
+            drawUI();
+        }
+    }
 
+    speed.onchange = function() {
+        if (!reg.test(speed.value)) {
+           speed.value = pathNodeTime; 
+        }
+        if(!started) {
+            pathNodeTime = speed.value;
+        }
+    }
+
+    loop.onclick = function() {        
+        var x = $( loop ).hasClass( "active" );
+        looping = x = !x;
+    }
 
     reset.onclick = function() {
         context.clearRect(0, 0, width, height);
         age = 0;
+        pathNodeTime = speed.value;
         paused = true;
         started = false;
         start.innerHTML = "Start";
@@ -200,7 +226,6 @@ function jitter(point, jitter) {
     if (Math.random() > 0.5) {
         rnd = Math.abs(rnd);
     }
-    console.log(point, rnd);
     point.x += rnd;
     point.y += rnd;
     return point;
@@ -209,6 +234,15 @@ function jitter(point, jitter) {
 function calculatePathPosition(ratio) {
     var i = Math.floor(ratio);
     var pointratio = ratio - i;
+    if(i == aiPathWaypointCount) {
+        age = 0;
+    }
+    if(i == aiPathWaypointCount && !looping) {
+        paused = true;
+        var start = document.getElementById("start");
+        start.innerHTML = 'Resume';
+    }
+    
     var p0 = aiPathWaypoints[(i - 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
     var p1 = aiPathWaypoints[i % aiPathWaypoints.length];
     var p2 = aiPathWaypoints[(i + 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
