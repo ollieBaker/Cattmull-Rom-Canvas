@@ -9,7 +9,7 @@ var canvas,
 
 var paused = true,
     started = false,
-	aiPathWaypoints = [],
+    aiPathWaypoints = [],
     pathNodeTime = 2,
     aiPathWaypointCount = 64,
     aiPathSize,
@@ -33,11 +33,11 @@ var paused = true,
         x: width - aiPathSizeOffset,
         y: height - aiPathSizeOffset
     };
-    
+
     canvas = createFullScreenCanvas('canvas');
     canvasUI = createFullScreenCanvas('canvasUI');
 
-    generatePath();
+    generateBetterPath();
 
     if (canvas.getContext) {
         context = canvas.getContext("2d");
@@ -51,20 +51,20 @@ var paused = true,
         contextUI.webkitImageSmoothingEnabled = true;
         drawUI();
     }
-    
+
     var reset = document.getElementById('reset');
     var start = document.getElementById('start');
     var waypoints = document.getElementById('waypoints');
     waypoints.value = aiPathWaypointCount;
-   
+
     var reg = new RegExp(/^\d+$/);
-    waypoints.onchange = function() {        
-        if(!reg.test(waypoints.value) || waypoints.value < 2 || waypoints.value > 512) {
+    waypoints.onchange = function() {
+        if (!reg.test(waypoints.value) || waypoints.value < 2 || waypoints.value > 512) {
             waypoints.value = aiPathWaypointCount;
-       }
-       aiPathWaypointCount = waypoints.value;
+        }
+        aiPathWaypointCount = waypoints.value;
     };
-   
+
 
     reset.onclick = function() {
         context.clearRect(0, 0, width, height);
@@ -72,14 +72,14 @@ var paused = true,
         paused = true;
         started = false;
         start.innerHTML = "Start";
-        generatePath();
+        generateBetterPath();
         drawUI();
     };
 
     start.onclick = function() {
-        if(paused) {
+        if (paused) {
             paused = false;
-            start.innerHTML = 'Pause';            
+            start.innerHTML = 'Pause';
             date = Date.now();
         } else {
             paused = true;
@@ -88,11 +88,11 @@ var paused = true,
     };
 
     window.onblur = function() {
-   		paused = true;
-        if(started) {
+        paused = true;
+        if (started) {
             start.innerHTML = 'Resume';
         }
-	};
+    };
 
     var canvasContainer = document.getElementById('canvasContainer');
     canvasContainer.onclick = hideUI;
@@ -112,7 +112,7 @@ function createFullScreenCanvas(id) {
     return c;
 }
 
-function hideUI() {	
+function hideUI() {
     var uiContainer = document.getElementById('uiContainer');
     if (canvasUI.style.visibility == "hidden") {
         canvasUI.style.visibility = "visible";
@@ -124,10 +124,10 @@ function hideUI() {
 }
 
 function draw() {
-	if(paused == true) {
-		requestAnimationFrame(draw);
-		return;
-	}
+    if (paused == true) {
+        requestAnimationFrame(draw);
+        return;
+    }
 
     started = true;
 
@@ -175,7 +175,7 @@ function resizeCanvas() {
     canvasUI.width = window.innerWidth;
     canvasUI.height = window.innerHeight;
     drawUI();
-	width = window.innerWidth;
+    width = window.innerWidth;
     height = window.innerHeight;*/
 }
 
@@ -190,6 +190,45 @@ function spline(p0, p1, p2, p3, t) {
                 t * ((2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) +
                     t * (-p0.y + 3 * p1.y - 3 * p2.y + p3.y))))
     };
+}
+
+function generateBetterPath() {
+    var gridSize = 78;
+    var halfGridSize = gridSize * 0.5;
+    var gridX = Math.floor(width / gridSize) - 2;
+    var gridY = Math.floor(height / gridSize) - 1;
+
+    var points = [];
+    for (var i = 0; i < gridX; i++) {
+        for (var j = 0; j < gridY; j++) {
+            points.push({
+                x: (i * gridSize) + (halfGridSize + gridSize),
+                y: (j * gridSize) + (halfGridSize + gridSize)
+            });
+        }
+    }
+
+    aiPathWaypoints = [];
+    var n = aiPathWaypointCount;
+    for (var i = 0; i < n; i++) {
+        var rnd = Math.floor(Math.random() * points.length);
+        var p = points[rnd];
+        p = jitter(p, gridSize * 0.3);
+        aiPathWaypoints.push(p);
+        points.splice(rnd, 1);
+    }
+    point = null;
+}
+
+function jitter(point, jitter) {
+    var rnd = -Math.random() * jitter;
+    if (Math.random() > 0.5) {
+        rnd = Math.abs(rnd);
+    }
+    console.log(point, rnd);
+    point.x += rnd;
+    point.y += rnd;
+    return point;
 }
 
 function generatePath() {
