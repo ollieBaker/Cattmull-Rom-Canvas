@@ -66,7 +66,7 @@ module.exports = function(grunt){
                 tasks: ['concat:js','uglify']
             },
             css: {
-                files: ['library/scss/**/*.scss'],
+                files: ['src/css/*.css'],
                 tasks: ['buildcss']
             },
             livereload: {
