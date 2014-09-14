@@ -40,9 +40,10 @@ module.exports = function(grunt){
         },
 
         cssmin: {
-            build: {
-                src: 'css/style-min.css',
-                dest: 'css/style-min.css'
+            combine: {
+                files: {
+                'css/style-min.css': ['src/css/normalize.css', 'src/css/main.css']
+                }
             }
         },
 
@@ -111,6 +112,6 @@ module.exports = function(grunt){
 
     grunt.registerTask('default',   ['build', 'watch']);
     grunt.registerTask('build',     ['buildcss', 'concat:js', 'uglify' ]);
-    grunt.registerTask('buildcss',  ['concat:css', 'autoprefixer','cssc', 'cssmin']);
+    grunt.registerTask('buildcss',  ['autoprefixer', 'cssmin']);
 
 };
