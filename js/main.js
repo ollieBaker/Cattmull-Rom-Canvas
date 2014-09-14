@@ -57,7 +57,7 @@ var paused = true,
             waypoints.value = aiPathWaypointCount;
         }
         aiPathWaypointCount = waypoints.value;
-        if(!started) {
+        if (!started) {
             context.clearRect(0, 0, width, height);
             age = 0;
             paused = true;
@@ -70,15 +70,15 @@ var paused = true,
 
     speed.onchange = function() {
         if (!reg.test(speed.value)) {
-           speed.value = pathNodeTime; 
+            speed.value = pathNodeTime;
         }
-        if(!started) {
+        if (!started) {
             pathNodeTime = speed.value;
         }
     }
 
-    loop.onclick = function() {        
-        var x = $( loop ).hasClass( "active" );
+    loop.onclick = function() {
+        var x = $(loop).hasClass("active");
         looping = x = !x;
     }
 
@@ -234,15 +234,15 @@ function jitter(point, jitter) {
 function calculatePathPosition(ratio) {
     var i = Math.floor(ratio);
     var pointratio = ratio - i;
-    if(i == aiPathWaypointCount) {
+    if (i == aiPathWaypointCount) {
         age = 0;
     }
-    if(i == aiPathWaypointCount && !looping) {
+    if (i == aiPathWaypointCount && !looping) {
         paused = true;
         var start = document.getElementById("start");
         start.innerHTML = 'Resume';
     }
-    
+
     var p0 = aiPathWaypoints[(i - 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
     var p1 = aiPathWaypoints[i % aiPathWaypoints.length];
     var p2 = aiPathWaypoints[(i + 1 + aiPathWaypoints.length) % aiPathWaypoints.length];
